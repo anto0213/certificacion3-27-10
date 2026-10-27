@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoluntaMe - Panel Principal</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 1rem; }
+        .cabecera { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 1rem; }
+        .btn { padding: 0.5rem 1rem; background: #2196f3; color: white; text-decoration: none; border-radius: 4px; margin-left: 0.5rem; }
+        .btn-rojo { background: #f44336; }
+        .btn-verde { background: #4caf50; }
+        .tarjeta { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .etiqueta { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; }
+        .activa { background: #e8f5e9; color: #2e7d32; }
+        .pasada { background: #f5f5f5; color: #666; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <div class="cabecera">
+        <h1>Bienvenid@, {{ session.nombre }}!</h1>
+        <div>
+            <a href="/nueva" class="btn btn-verde">+ Nueva Misión</a>
+            <a href="/cerrar_sesion" class="btn btn-rojo">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for cat, msg in messages %}
+                <p class="{{ cat }}">{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <h2>Misiones Activas</h2>
+    {% if misiones %}
+        {% for mision in misiones %}
+            <div class="tarjeta">
+                <h3>{{ mision.nombre }}</h3>
+                <p><strong>Fecha:</strong> {{ mision.fecha }}</p>
+                <p><strong>Líder:</strong> {{ mision.lider_nombre }} {{ mision.lider_apellido }}</p>
+                <p><strong>Voluntarios:</strong> {{ mision.inscritos }} / {{ mision.voluntarios_necesarios }}</p>
+                <p>{{ mision.descripcion }}</p>
+                <a href="/ver/{{ mision.id }}" class="btn">Ver detalles</a>
+                {% if mision.lider_id == session.usuario_id %}
+                    <a href="/editar/{{ mision.id }}" class="btn">Editar</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No hay misiones activas en este momento.</p>
+    {% endif %}
+
+    <h2>Misiones Pasadas</h2>
+    {% if pasadas %}
+        {% for mision in pasadas %}
+            <div class="tarjeta">
+                <span class="etiqueta pasada">Finalizada</span>
+                <h3>{{ mision.nombre }}</h3>
+                <p><strong>Fecha:</strong> {{ mision.fecha }}</p>
+                <p><strong>Líder:</strong> {{ mision.lider_nombre }} {{ mision.lider_apellido }}</p>
+                <p><strong>Voluntarios que participaron:</strong> {{ mision.inscritos }}</p>
+                <a href="/ver/{{ mision.id }}" class="btn">Ver detalles</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Aún no hay misiones finalizadas.</p>
+    {% endif %}
+</body>
+</html>
